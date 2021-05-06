@@ -1,4 +1,4 @@
-# yellowpages-web-scraping
+# Web-Scraping
 Web scraping
 1. Simple crawler to extract names of businesses, their phone numbers, address and age of the business from yellowpages.com.
 The crawler was built using the beautifulsoup python library.
