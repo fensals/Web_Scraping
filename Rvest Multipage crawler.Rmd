@@ -1,0 +1,115 @@
+---
+title: "Web Scrapping in R"
+author: "Fensals"
+date: "6/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+#Importing all necessary libraries
+
+library(rvest)
+library(tidyverse)
+library(readxl)
+library(dplyr)
+```
+
+
+```{r}
+
+EventTribe <- data.frame() #Creating an empty data frame for extracted data
+
+urls <- read_csv("input1.csv") #Importing the dataset
+
+urls <- (urls$search_urls) #Subsetting the column containing the urls (not necessary, i like my codes neat.)
+
+for(url in urls) {
+  
+  web <- read_html(url) # loop reading each url
+  
+  Page_result <- web %>% html_nodes('.eds-l-mar-hor-3') %>% html_text() #Getting the web element that contains the number of pages
+  
+  No_of_Pages <- gsub("1 of ","",Page_result)%>% as.numeric() #Extracting the number of pages
+
+  url_new <- str_sub(url,1,nchar(url)-1) #removing the page number from the url to allow for looping through different page numbers
+  
+  
+    for (page_No in seq(No_of_Pages)) { #creating a loop to go through all the pages of the url
+   
+      link <- paste0(url_new,page_No) #concatenating the url(without page number) with each page number based on the number of pages
+    
+      webpage <- read_html(link) #extracting the html data on the url
+    
+    
+  #Extracting required data using html_nodes to extract the data based on the css selector specified.
+      
+      Title <-  webpage %>% html_nodes("div.eds-structure.eds-structure--min-height div.eds-structure__body div.eds-structure__main-mask div.eds-structure__fixed-bottom-bar-layout-wrapper div.eds-fixed-bottom-bar-layout div.eds-fixed-bottom-bar-layout__content div.eds-structure__main-container main.eds-structure__main div.feed-search-page div.search-base-screen__root section.search-base-screen__search-panel div.search-results-panel-content div.search-main-content ul.search-main-content__events-list:nth-child(1) div.search-event-card-wrapper div.search-event-card-rectangle-image div.search-event-card.eds-l-mar-vert-1 div.eds-event-card--consumer div.eds-card.eds-card--neutral article.eds-l-pad-all-4.eds-event-card-content.eds-event-card-content--list.eds-event-card-content--standard.eds-event-card-content--fixed div.eds-event-card-content__content-container.eds-l-pad-right-4 div.eds-event-card-content__content div.eds-event-card-content__content__principal div.eds-event-card-content__primary-content a.eds-event-card-content__action-link h3.eds-event-card-content__title.eds-text-color--ui-800.eds-text-bl.eds-text-weight--heavy div:nth-child(1) > div.eds-event-card__formatted-name--is-clamped.eds-event-card__formatted-name--is-clamped-three.eds-text-weight--heavy") %>% html_text()
+    
+    
+      Address <-  webpage %>% html_nodes("div.eds-structure.eds-structure--min-height div.eds-structure__body div.eds-structure__main-mask div.eds-structure__fixed-bottom-bar-layout-wrapper div.eds-fixed-bottom-bar-layout div.eds-fixed-bottom-bar-layout__content div.eds-structure__main-container main.eds-structure__main div.feed-search-page div.search-base-screen__root section.search-base-screen__search-panel div.search-results-panel-content div.search-main-content ul.search-main-content__events-list:nth-child(1) div.search-event-card-wrapper div.search-event-card-square-image div.search-event-card.eds-l-mar-vert-1 div.eds-event-card--consumer div.eds-card.eds-card--neutral article.eds-l-pad-all-4.eds-event-card-content.eds-event-card-content--list.eds-event-card-content--mini.eds-event-card-content--square div.eds-event-card-content__content-container.eds-l-pad-right-4 div.eds-event-card-content__content div.eds-event-card-content__content__principal div.eds-event-card-content__sub-content div.eds-event-card-content__sub.eds-text-bm.eds-text-color--ui-600.eds-l-mar-top-1.eds-event-card-content__sub--cropped > div.card-text--truncated__one") %>% html_text()
+    
+    
+      Date <- webpage %>% html_nodes(" div.eds-structure.eds-structure--min-height div.eds-structure__body div.eds-structure__main-mask div.eds-structure__fixed-bottom-bar-layout-wrapper div.eds-fixed-bottom-bar-layout div.eds-fixed-bottom-bar-layout__content div.eds-structure__main-container main.eds-structure__main div.feed-search-page div.search-base-screen__root section.search-base-screen__search-panel div.search-results-panel-content div.search-main-content ul.search-main-content__events-list:nth-child(1) div.search-event-card-wrapper div.search-event-card-rectangle-image div.search-event-card.eds-l-mar-vert-1 div.eds-event-card--consumer div.eds-card.eds-card--neutral article.eds-l-pad-all-4.eds-event-card-content.eds-event-card-content--list.eds-event-card-content--standard.eds-event-card-content--fixed div.eds-event-card-content__content-container.eds-l-pad-right-4 div.eds-event-card-content__content div.eds-event-card-content__content__principal div.eds-event-card-content__primary-content > div.eds-evet-card-content__sub-title.eds-text-color--ui-orange.eds-l-pad-bot-1.eds-l-pad-top-2.eds-text-weight--heavy.eds-text-bm") %>% html_text()
+    
+    
+      Link <-  webpage %>% html_nodes("div.eds-structure.eds-structure--min-height div.eds-structure__body div.eds-structure__main-mask   div.eds-structure__fixed-bottom-bar-layout-wrapper div.eds-fixed-bottom-bar-layout div.eds-fixed-bottom-bar-layout__content div.eds-structure__main-container main.eds-structure__main div.feed-search-page div.search-base-screen__root section.search-base-screen__search-panel div.search-results-panel-content div.search-main-content ul.search-main-content__events-list:nth-child(1) div.search-event-card-wrapper div.search-event-card-rectangle-image div.search-event-card.eds-l-mar-vert-1 div.eds-event-card--consumer div.eds-card.eds-card--neutral article.eds-l-pad-all-4.eds-event-card-content.eds-event-card-content--list.eds-event-card-content--standard.eds-event-card-content--fixed div.eds-event-card-content__content-container.eds-l-pad-right-4 div.eds-event-card-content__content div.eds-event-card-content__content__principal div.eds-event-card-content__primary-content > a.eds-event-card-content__action-link") %>%html_attr("href") %>% paste0()
+    
+   
+      Category <- webpage %>% html_nodes(".eds-l-pad-right-6+ .filter-panel__drawers__item .filter-panel__drawers__item__header--active") %>%html_text()
+       
+      Format <- webpage %>% html_nodes(".filter-panel__drawers__item:nth-child(8) .filter-panel__drawers__item__header--active") %>% html_text()
+      
+      #Alternative means to get the category and Format by splitting each url (it is not necessary to read the html, if what we want is already a part of the URL)
+      
+      Category <-  link %>%  #specifying what i want to split
+              str_split(pattern = '/')%>% #split the link from each point there is a '/' (this splits the link into 7 parts)
+              map_chr(6)%>%   #select the 6th element whiich is what contains the category and format text
+              str_split(pattern = '--')%>% #Split the 6th element at each point there is "--"
+              map_chr(2) #Extract the 2nd element as category
+    
+    
+     
+     Format <-  link %>% 
+              str_split(pattern = '/')%>% 
+              map_chr(6)%>%   
+              str_split(pattern = '--')%>%
+              map_chr(3) #Extract the 3rd element as format
+    
+    
+    
+      Country <-  link %>%
+              str_split(pattern = '/')%>% 
+              map_chr(5) #return the 5th value in the split
+    
+      
+      Page_No <-  link %>% 
+              str_split(pattern = '/')%>% 
+              map_chr(7)%>%   
+              str_split(pattern = '=')%>%
+              map_chr(2)
+    
+      Timestamp <- Sys.time() #Indicate the time of scraping the data.
+    
+      
+      #for each  cycle the loop makes, Save data in "Event' and row bind it to the initial data frame 'EventTribe'
+      
+      Event <-  data.frame(Timestamp, Link, Title, Address, Date, Category, Format, Country, Page_No, stringsAsFactors = FALSE)
+    
+      EventTribe <- EventTribe %>% bind_rows(Event) 
+      
+      
+  }
+  
+}
+
+
+write.csv(EventTribe,"EventTribe.csv", row.names = TRUE) #extract all the extracted data as a csv file to be saved in working directory (or a specified folder)
+
+```
+
